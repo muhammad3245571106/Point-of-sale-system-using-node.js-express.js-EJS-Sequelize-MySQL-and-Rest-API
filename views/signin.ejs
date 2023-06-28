@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+<meta name="description" content="POS - Bootstrap Admin Template">
+<meta name="keywords" content="admin, estimates, bootstrap, business, corporate, creative, invoice, html5, responsive, Projects">
+<meta name="author" content="Dreamguys - Bootstrap Admin Template">
+<meta name="robots" content="noindex, nofollow">
+<title>Login - Pos admin template</title>
+        <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/plugins/fontawesome/css/fontawesome.min.css">
+		<link rel="stylesheet" href="/plugins/fontawesome/css/all.min.css">
+        <link rel="stylesheet" href="/css/style.css">
+    </head>
+    <body class="account-page">
+        <div class="main-wrapper">
+			<div class="account-content">
+				<div class="login-wrapper">
+                    <div class="login-content">
+                        <div class="login-userset">
+                             <div class="login-logo logo-normal">
+                                <img src="/img/logo.png" alt="img">
+                            </div>
+							<a href="/" class="login-logo logo-white">
+								<img src="/img/logo-white.png" alt>
+							</a>
+                            <div class="login-userheading">
+                                <h3>Sign In</h3>
+                                <h4>Please login to your account</h4>
+                            </div>
+                           <div class="form-login">
+                                <label>Username</label>
+                                <div class="form-addons">
+                                    <input type="text" id="signInUsername" placeholder="Enter your username">
+                                    <!-- <img src="/img/icons/mail.svg" alt="img"> -->
+                                </div>
+                            </div>
+                            <div class="form-login">
+                                <label>Password</label>
+                                <div class="pass-group">
+                                    <input type="password" id="signInPassword" class="pass-input" placeholder="Enter your password">
+                                    <!-- <span class="fas toggle-password fa-eye-slash"></span> -->
+                                </div>
+                            </div>
+                            <!-- <div class="form-login">
+                                <div class="alreadyuser">
+                                    <h4><a href="/forgetpassword" class="hover-a">Forgot Password?</a></h4>
+                                </div>
+                            </div> -->
+                            <div class="form-login">
+                                <button class="btn btn-login" onclick="signIn()">Sign In</button>
+                                <!-- <a class="btn btn-login" href="/">Sign In</a> -->
+                            </div>
+                            <!-- <div class="signinform text-center">
+                                <h4>Don’t have an account? <a href="/signup" class="hover-a">Sign Up</a></h4>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div class="login-img">
+                        <img src="/img/login.jpg" alt="img">
+                    </div>
+                </div>
+			</div>
+        </div>
+        <script>
+            function signIn() {
+                var username = document.getElementById("signInUsername").value;
+                var password = document.getElementById("signInPassword").value;
+
+                fetch("http://localhost:3000/api/auth/signin", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({C_Username: username, C_Password: password})
+                })
+                .then(async response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    else{
+                        
+
+                        fetch("http://localhost:3000/api/auth/getEmail/"+username)
+					.then(response => {
+                        // alert("Enters")
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			}).then(data => {
+                window.location.href = `/sendMail/${data["C_Email"]}`
+			})
+				.catch((error) => {
+					console.error('There was an error!', error);
+				});
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('There was an error!', error);
+                    alert("Your Username or Password is incorrect")
+                });
+            }
+        </script>
+        <script src="/js/jquery-3.6.0.min.js"></script>
+		<script src="/js/feather.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+		<script src="/js/script.js"></script>
+    </body>
+</html>

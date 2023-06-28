@@ -1,0 +1,26 @@
+<div class="dropdown mobile-user-menu">
+    <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+        aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="/profile">My Profile</a>
+        <a class="dropdown-item" id="logoutButton" href="/signin">Logout</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById("logoutButton").addEventListener("click", function(){
+    fetch("http://localhost:3000/api/auth/logout", {
+        method: 'GET',
+      }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                window.location.href = "/signin";
+            }).catch((error) => {
+                    console.error('There was an error!', error);
+                });
+
+                alert("You have been logged out!");
+
+});
+</script>

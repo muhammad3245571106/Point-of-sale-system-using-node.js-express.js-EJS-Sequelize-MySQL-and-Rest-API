@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/_index', user) %>
+	<div class="page-wrapper">
+		<div class="content">
+			<div class="page-header">
+				<div class="page-title">
+					<h4>Product Category list</h4>
+					<h6>View/Search product Category</h6>
+				</div>
+				<div class="page-btn">
+					<a href="/addcategory" class="btn btn-added">
+						<img src="/img/icons/plus.svg" class="me-1" alt="img">Add Category
+					</a>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-body">
+					<div class="table-top">
+						<div class="search-set">
+							<div class="search-input">
+								<a class="btn btn-searchset"><img src="/img/icons/search-white.svg" alt="img"></a>
+							</div>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<table class="table  " id="dtable">
+							<thead>
+								<tr>
+									<th>
+										<label class="checkboxs">
+											<input type="checkbox" id="select-all">
+											<span class="checkmarks"></span>
+										</label>
+									</th>
+									<th>Category name</th>
+									<th>Description</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<script>
+		document.addEventListener("DOMContentLoaded", viewCategory());
+		function viewCategory() {
+			fetch("http://localhost:3000/api/customer/category", {
+				method: "GET",
+			}).then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			}).then(data => {
+				createTable(data)
+			})
+				.catch((error) => {
+					console.error('There was an error!', error);
+				});
+		}
+		function deleteCategory(categoryName){
+fetch("http://localhost:3000/api/customer/category/"+categoryName, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }).then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				const xhr = new XMLHttpRequest();
+xhr.open('GET', 'http://localhost:3000/api/customer/category', true);
+var result = document.getElementById("dtable")
+				var tbody =result.getElementsByTagName("tbody")[0];
+xhr.onreadystatechange = function() {
+	tbody.innerHTML = `<h1>data</h1>`
+  if (xhr.readyState === XMLHttpRequest.DONE) {
+	tbody.innerHTML = `<h1>data done</h1>`
+    if (xhr.status === 200) {
+      const response = JSON.parse(xhr.responseText);
+				tbody.innerHTML = ``
+	  createTable(response)
+	  alert("Deleted successfully")
+    } else {
+      console.error('Error:', xhr.status);
+    }
+  }
+};
+xhr.send();
+			})
+.catch((error) => {
+				console.error('There was an error!', error);
+			});
+			
+}
+		function createTable(dataArray) {
+			if (dataArray && dataArray !== undefined && dataArray.length != 0) {
+				var result = document.getElementById("dtable")
+				var tbody =result.getElementsByTagName("tbody")	[0];
+				for (var i = 0; i < dataArray.length; i++) {
+					var tr = document.createElement('tr');
+					var td1 = document.createElement('td');
+					var td2 = document.createElement('td');
+					var td3 = document.createElement('td');
+					var td4 = document.createElement('td');
+					var categoryName = dataArray[i]["Cat_Name"]
+					var categoryDescription= dataArray[i]["Cat_Description"]
+					td1.innerHTML = `<td><label class="checkboxs"><input type="checkbox"><span class="checkmarks"></span></label></td>`
+					td2.innerText = dataArray[i]["Cat_Name"]
+					td3.innerText = dataArray[i]["Cat_Description"]
+					td4.innerHTML = `<td>
+										<a class="me-3" href="/editcategory?categoryNameForward=${categoryName}&categoryDescriptionForward=${categoryDescription}">
+											<img src="/img/icons/edit.svg" alt="img">
+										</a>
+										<a class="me-3" onclick="deleteCategory('${categoryName}')">
+											<img src="/img/icons/delete.svg" alt="img">
+										</a>
+									</td>`
+					tr.appendChild(td1);
+					tr.appendChild(td2);
+					tr.appendChild(td3);
+					tr.appendChild(td4);
+					tbody.appendChild(tr);
+				}
+			}
+			else{
+				console.log("Error while creating table")
+			}
+		}
+	</script>
+	<script src="/js/jquery-3.6.0.min.js"></script>
+	<script src="/js/feather.min.js"></script>
+	<script src="/js/jquery.slimscroll.min.js"></script>
+	<script src="/js/jquery.dataTables.min.js"></script>
+	<script src="/js/dataTables.bootstrap4.min.js"></script>
+	<script src="/js/bootstrap.bundle.min.js"></script>
+	<script src="/plugins/select2/js/select2.min.js"></script>
+	<script src="/plugins/sweetalert/sweetalert2.all.min.js"></script>
+	<script src="/plugins/sweetalert/sweetalerts.min.js"></script>
+	<script src="/js/script.js"></script>
+	</body>
+
+</html>

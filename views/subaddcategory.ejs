@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+	<link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <%- include('./partials/_index', user) %>
+			<div class="page-wrapper">
+				<div class="content">
+					<div class="page-header">
+						<div class="page-title">
+							<h4>Product Add sub Category</h4>
+							<h6>Create new product Category</h6>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-body">
+							<div class="row">
+								<div class="col-lg-4 col-sm-6 col-12">
+									<div class="form-group">
+										<label>Parent Category</label>
+										<select class="select">
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-4 col-sm-6 col-12">
+									<div class="form-group">
+										<label>Category Name</label>
+										<input type="text" id="subCategoryName">
+									</div>
+								</div>
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label>Description</label>
+										<textarea class="form-control" id="subCategoryDescription"></textarea>
+									</div>
+								</div>
+								<div class="col-lg-12">
+									<button class="btn btn-submit" onclick="addSubCategory()">Submit</button>
+									<a href="/subcategorylist" class="btn btn-cancel">Cancel</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+        </div>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				fetch("http://localhost:3000/api/customer/category")
+                	.then(response => {
+                    	if (!response.ok) {
+                        	throw new Error('Network response was not ok');
+                    	}
+                    	return response.json();
+               	 	})
+					.then(data => {
+						for(i=0;i<data.length;++i){
+							document.querySelector(".form-group .select").innerHTML += (`<option>${data[i]["Cat_Name"]}</option>`)
+						}
+					})
+                	.catch((error) => {
+                    	console.error('There was an error!', error);
+                    	alert("Some error occurs, please try again")
+                	});
+			})
+            function addSubCategory() {
+				var subCategoryName = document.getElementById("subCategoryName").value
+				var subCategoryDescription = document.getElementById("subCategoryDescription").value
+				var parentCategory = document.querySelector(".select2-selection__rendered").textContent
+				if (subCategoryName !== "" || subCategoryDescription !== "") {
+					fetch("http://localhost:3000/api/customer/subcategory", {
+                    	method: "POST",
+                    	headers: {
+                        	'Content-Type': 'application/json'
+                    	},
+                    	body: JSON.stringify({SubCat_Name: subCategoryName, SubCat_Description: subCategoryDescription, Cat_Name: parentCategory})
+                	})
+                	.then(response => {
+                    	if (!response.ok) {
+							console.log(response)
+                        	throw new Error('Network response was not ok');
+                    	}
+                    	else{
+                        	alert("Sub Category Added Successfully");
+							document.getElementById("subCategoryName").value = ""
+							document.getElementById("subCategoryDescription").value = ""
+                   	 	}
+                    	return response.json();
+               	 	})
+                	.catch((error) => {
+                    	console.error('There was an error!', error);
+                    	alert("Some error occurs, please try again")
+                	});
+				}
+				else{
+					alert("Please fill required fields")
+				}
+            }
+        </script>
+
+        <script src="/js/jquery-3.6.0.min.js"></script>
+		<script src="/js/feather.min.js"></script>
+		<script src="/js/jquery.slimscroll.min.js"></script>
+		<script src="/js/jquery.dataTables.min.js"></script>
+		<script src="/js/dataTables.bootstrap4.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+		<script src="/plugins/select2/js/select2.min.js"></script>
+		<script src="/plugins/sweetalert/sweetalert2.all.min.js"></script>
+		<script src="/plugins/sweetalert/sweetalerts.min.js"></script>
+		<script src="/js/script.js"></script>
+    </body>
+</html>

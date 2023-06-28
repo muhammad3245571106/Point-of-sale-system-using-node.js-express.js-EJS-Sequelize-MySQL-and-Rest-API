@@ -1,0 +1,14 @@
+<%- include('./_head') %>
+<body>
+<div id="global-loader">
+    <div class="whirly-loader"> </div>
+</div>
+<div class="main-wrapper">
+<%- include('./_topbar/_topbar', {username:user.name,role:user.role}) %>
+<% if (typeof active !== 'undefined') { %>
+    <%- include('./_sidebar/_sidebar', {active:active}) %>
+  <% } else { %>
+    <%- include('./_sidebar/_sidebar', {active:""}) %>
+  <% } %>
+</div>
+</body>

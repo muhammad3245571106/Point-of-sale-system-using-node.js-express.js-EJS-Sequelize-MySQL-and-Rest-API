@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('./partials/_index', user) %>
+			<div class="page-wrapper">
+				<div class="content">
+					<div class="page-header">
+						<div class="page-title">
+							<h4>Product Edit Category</h4>
+							<h6>Edit a product Category</h6>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-body">
+							<div class="row">
+								<div class="col-lg-6 col-sm-6 col-12">
+									<div class="form-group">
+										<label>Category Name</label>
+										<input type="text" id="catName" value=<%= categoryNameForward %> >
+									</div>
+								</div>
+								
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label>Description</label>
+										<textarea id="categoryDescription" class="form-control"><%= categoryDescriptionForward %></textarea>
+									</div>
+								</div>
+								<div class="col-lg-12">
+									<button type="submit" onclick="editCategory()" class="btn btn-submit me-2">Submit</button>
+									<!-- <a href="javascript:void(0);" class="btn btn-submit me-2">Submit</a> -->
+									<a href="/categorylist" class="btn btn-cancel">Cancel</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+        </div>
+		<script>
+			function editCategory() {
+				var categoryNameForward = "<%= categoryNameForward %>";
+				var categoryName = document.getElementById("catName").value;
+                var categoryDescription = document.getElementById("categoryDescription").value;
+				console.log(categoryNameForward);
+				console.log(categoryDescription);
+				console.log(categoryName);
+				if (categoryName != "" || categoryDescription != "") {
+					fetch("http://localhost:3000/api/customer/category/" + categoryNameForward, {
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							Cat_Name: categoryName,
+							Cat_Description: categoryDescription,
+						}),
+					}).then(response => {
+						if (!response.ok) {
+							throw new Error('Network response was not ok');
+						}
+						return response.json();
+					}).then(data => {
+						console.log(data);
+						alert("Category Updated Successfully");
+						window.location.href = "/categorylist"
+					}).catch((error) => {
+							console.error('There was an error!', error);
+							alert("Please Fill All Fields")
+					});
+				}
+			}
+		</script>
+        <script src="/js/jquery-3.6.0.min.js"></script>
+		<script src="/js/feather.min.js"></script>
+		<script src="/js/jquery.slimscroll.min.js"></script>
+		<script src="/js/jquery.dataTables.min.js"></script>
+		<script src="/js/dataTables.bootstrap4.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+		<script src="/plugins/select2/js/select2.min.js"></script>
+		<script src="/plugins/sweetalert/sweetalert2.all.min.js"></script>
+		<script src="/plugins/sweetalert/sweetalerts.min.js"></script>
+		<script src="/js/script.js"></script>
+    </body>
+</html>

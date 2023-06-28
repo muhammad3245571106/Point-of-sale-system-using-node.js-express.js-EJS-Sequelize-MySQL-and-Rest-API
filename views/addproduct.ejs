@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+<%- include('./partials/_index', user) %>
+	<div class="page-wrapper">
+		<div class="content">
+			<div class="page-header">
+				<div class="page-title">
+					<h4>Product Add</h4>
+					<h6>Create new product</h6>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-lg-3 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Product Name</label>
+								<input type="text" id="productName">
+							</div>
+						</div>
+						<div class="col-lg-3 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Quantity</label>
+								<input type="text" id="productQuantity">
+							</div>
+						</div>
+						<div class="col-lg-3 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Base Price</label>
+								<input type="text" id="basePrice">
+							</div>
+						</div>
+						<div class="col-lg-3 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Sell Price</label>
+								<input type="text" id="sellPrice">
+							</div>
+						</div>
+						<div class="col-lg-3 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Category</label>
+								<select class="select" onchange="categoryChanged()">
+								</select>
+							</div>
+						</div>
+						<div class="col-lg-3 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Sub Category</label>
+								<select class="select">
+								</select>
+							</div>
+						</div>
+						<div class="col-lg-3 col-sm-6 col-12">
+							<div class="form-group">
+								<label>Barcode</label>
+								<input type="text" id="productBarcode">
+							</div>
+						</div>
+						<div class="col-lg-12">
+							<div class="form-group">
+								<label>Description</label>
+								<textarea class="form-control" id="productDescription"></textarea>
+							</div>
+						</div>
+						<div class="col-lg-12">
+							<button class="btn btn-submit" onclick="addProduct()">Submit</button>
+							<a href="/productlist" class="btn btn-cancel">Cancel</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<script>
+		currentCategory = ""
+		document.addEventListener("DOMContentLoaded", () => {
+			fetch("http://localhost:3000/api/customer/category")
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+					return response.json();
+				})
+				.then(data => {
+					for (i = 0; i < data.length; ++i) {
+						document.querySelector(".form-group .select").innerHTML += (`<option>${data[i]["Cat_Name"]}</option>`)
+					}
+					currentCategory = data[0].Cat_Name
+					loadSubCategories(currentCategory)
+				})
+				.catch((error) => {
+					console.error('There was an error!', error);
+					alert("Some error occurs, please try again")
+				});
+		})
+
+		function categoryChanged() {
+			currentCategory = document.querySelectorAll(".form-group .select")[0].options[document.querySelectorAll(".form-group .select")[0].selectedIndex].value
+			loadSubCategories(currentCategory)
+		}
+		function loadSubCategories(parentCategory) {
+			fetch("http://localhost:3000/api/customer/subcategory?catName=" + parentCategory)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+					return response.json();
+				})
+				.then(data => {
+					document.querySelectorAll(".form-group .select")[1].innerHTML = ``
+					for (i = 0; i < data.length; ++i) {
+						document.querySelectorAll(".form-group .select")[1].innerHTML += (`<option>${data[i]["SubCat_Name"]}</option>`)
+					}
+				})
+				.catch((error) => {
+					console.error('There was an error!', error);
+					alert("Some error occurs, please try again")
+				});
+		}
+
+		function addProduct() {
+			// getting values
+			let productName = document.getElementById("productName").value;
+			let productQuantity = document.getElementById("productQuantity").value;
+			let basePrice = document.getElementById("basePrice").value;
+			let sellPrice = document.getElementById("sellPrice").value;
+			let category = document.querySelector('.select').value;
+			let subcategory = document.querySelector('.select').value;
+			let productBarcode = document.getElementById("productBarcode").value;
+			let productDescription = document.getElementById("productDescription").value;
+
+			// Product Name
+			if (productName === '') {
+				alert('Please enter the product name');
+				return false;
+			}
+
+			// Quantity
+			if (productQuantity === '' || !Number.isInteger(Number(productQuantity)) || Number(productQuantity) < 1) {
+				alert('Please enter a valid product quantity');
+				return false;
+			}
+
+			// Base Price
+			if (basePrice === '' || isNaN(Number(basePrice)) || Number(basePrice) <= 0) {
+				alert('Please enter a valid base price');
+				return false;
+			}
+
+			// Sell Price
+			if (sellPrice === '' || isNaN(Number(sellPrice)) || Number(sellPrice) < Number(basePrice)) {
+				alert('Sell price must be equal to or greater than the base price');
+				return false;
+			}
+
+			// Category
+			if (category === '') {
+				alert('Please select a category');
+				return false;
+			}
+
+			// Sub Category
+			if (subcategory === '') {
+				alert('Please select a subcategory');
+				return false;
+			}
+
+			// Barcode
+			let regex = /^[A-Za-z0-9]+$/;
+			if (productBarcode === '' || !regex.test(productBarcode)) {
+				alert('Please enter a valid barcode');
+				return false;
+			}
+
+			// Product Description
+			if (productDescription === '') {
+				alert('Please enter a product description');
+				return false;
+			}
+
+
+
+			
+			
+			var quantity = document.getElementById("productQuantity").value
+			var barCode = document.getElementById("productBarcode").value
+			var categoryName = currentCategory
+			var subCategoryName = document.querySelectorAll(".form-group .select")[1].options[document.querySelectorAll(".form-group .select")[1].selectedIndex].innerText
+			var product = {
+				P_Name: productName,
+				P_Description: productDescription,
+				P_BasePrice: basePrice,
+				P_SellPrice: sellPrice,
+				P_Quantity: quantity,
+				P_BarCode: barCode,
+				SubCat_Name: subCategoryName,
+				Cat_Name: categoryName
+			}
+			console.log(product)
+			if (productName !== "" && productDescription !== "" && sellPrice !== "" && basePrice !== "" && quantity !== "" && barCode !== "") {
+				fetch("http://localhost:3000/api/customer/products", {
+					method: "POST",
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(product)
+				})
+					.then(response => {
+						if (!response.ok) {
+							throw new Error('Network response was not ok');
+						}
+						else {
+							alert("Product Added Successfully");
+							document.getElementById("productName").value = ""
+							document.getElementById("productDescription").value = ""
+							document.getElementById("productQuantity").value = ""
+							document.getElementById("basePrice").value = ""
+							document.getElementById("sellPrice").value = ""
+							document.getElementById("productBarcode").value = ""
+						}
+						return response.json();
+					})
+					.catch((error) => {
+						console.error('There was an error!', error);
+						alert("Some error occurs, please try again")
+					});
+			}
+			else {
+				alert("Please fill required fields")
+			}
+		}
+	</script>
+	<script src="/js/jquery-3.6.0.min.js"></script>
+	<script src="/js/feather.min.js"></script>
+	<script src="/js/jquery.slimscroll.min.js"></script>
+	<script src="/js/jquery.dataTables.min.js"></script>
+	<script src="/js/dataTables.bootstrap4.min.js"></script>
+	<script src="/js/bootstrap.bundle.min.js"></script>
+	<script src="/plugins/select2/js/select2.min.js"></script>
+	<script src="/plugins/sweetalert/sweetalert2.all.min.js"></script>
+	<script src="/plugins/sweetalert/sweetalerts.min.js"></script>
+	<script src="/js/script.js"></script>
+	</body>
+
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/plugins/owlcarousel/owl.carousel.min.css">
+<link rel="stylesheet" href="/plugins/owlcarousel/owl.theme.default.min.css">
+<style>
+
+</style>
+
+
+<%- include('./partials/_head') %>
+
+	<body>
+		<div id="global-loader">
+			<div class="whirly-loader"> </div>
+		</div>
+		<div class="main-wrapper">
+			<%- include('./partials/_topbar/_topbar', {name:"Awais",role:"Admin"}) %>
+		</div>
+		<div class="page-wrapper ms-0">
+			<div class="content">
+				<div class="row">
+					<div class="col-lg-8 col-sm-12 tabs_wrapper">
+						<div class="page-header ">
+							<div class="page-title">
+								<h4>Categories</h4>
+								<h6>Manage your purchases</h6>
+							</div>
+						</div>
+
+
+						<ul class=" tabs owl-carousel owl-theme owl-product  border-0 ">
+						</ul>
+						<div class="tabs_container">
+
+						</div>
+					</div>
+					<div class="col-lg-4 col-sm-12 ">
+						<div class="order-list">
+							<div class="orderid">
+								<h4>Order List</h4>
+								<h5>Transaction id : #65565</h5>
+							</div>
+						</div>
+						<div class="card card-order">
+							<div class="split-card">
+							</div>
+							<div class="card-body pt-0">
+								<div class="totalitem">
+									<h4>Total items : 1</h4>
+									<a href="javascript:void(0);" onclick="clearOrderList()">Clear all</a>
+								</div>
+								<div class="product-table">
+									<ul class="product-lists">
+										<li>
+											<div class="productimg">
+												<div class="productcontet">
+													<h4>Pineapple
+														<a href="javascript:void(0);" class="ms-2"
+															data-bs-toggle="modal" data-bs-target="#edit"><img
+																src="/img/icons/edit-5.svg" alt="img"></a>
+													</h4>
+												</div>
+											</div>
+										</li>
+										<li>3000.00 </li>
+										<li><a class="confirm-text" href="javascript:void(0);"><img
+													src="/img/icons/delete-2.svg" alt="img"></a>
+										</li>
+									</ul>
+
+								</div>
+							</div>
+							<div class="split-card">
+							</div>
+							<div class="card-body pt-0 pb-2">
+								<div class="setvalue">
+									<ul>
+										<li>
+											<h5>Subtotal </h5>
+											<h6>55.00</h6>
+										</li>
+										<li class="total-value">
+											<h5>Total </h5>
+											<h6>55.00</h6>
+										</li>
+									</ul>
+								</div>
+								<div class="setvaluecash">
+									<ul>
+										<li>
+											<a href="javascript:void(0);" onclick="doBill()" class="paymentmethod">
+												<img src="/img/icons/cash.svg" alt="img" class="me-2">
+												Cash
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+
+
+		<script>
+			// Keep track of current order list and total cost
+			let orderList = [];
+			let totalCost = 0;
+
+			document.addEventListener("DOMContentLoaded", function () {
+				getCategories();
+				getProductsByCategory('all');  // Get all products initially
+			});
+
+			function getCategories() {
+				fetch("http://localhost:3000/api/customer/category", {
+					method: "GET",
+				})
+					.then(response => response.json())
+					.then(data => {
+						const categoryContainer = document.querySelector('.tabs.owl-carousel.owl-theme.owl-product.border-0');
+						data.forEach(category => {
+							const li = document.createElement('li');
+							li.id = category["Cat_Name"];
+							li.innerHTML = `<div class="product-details "><h6>${category["Cat_Name"]}</h6></div>`;
+							li.onclick = function () { getProductsByCategory(category["Cat_Name"]); }; // Add onclick event to get products by category
+							categoryContainer.appendChild(li);
+						});
+					})
+					.catch(error => console.error('There was an error!', error));
+			}
+
+			function getProductsByCategory(categoryName) {
+				fetch("http://localhost:3000/api/customer/products", {
+					method: "GET",
+				})
+					.then(response => response.json())
+					.then(data => {
+						const products = data.filter(product => product["Cat_Name"] === categoryName || categoryName === 'all');
+						const tabsContainer = document.querySelector('.tabs_container');
+						tabsContainer.innerHTML = '';  // Clear tabs container
+						products.forEach(product => {
+							const div = document.createElement('div');
+							div.classList.add('tab_content', 'tab-pane', 'fade', 'show', 'active');
+							div.setAttribute('data-tab', product["Cat_Name"]);
+							div.innerHTML = `
+							<div class="row">
+								<div class="col-lg-3 col-sm-6 d-flex">
+									<div class="productset flex-fill ">
+										
+										<div class="check-product"><i class="fa fa-check"></i></div>
+										<div class="productsetcontent">
+											<h5>${product["Cat_Name"]}</h5>
+											<h4>${product["P_Name"]}</h4>
+											<h6>${product["P_SellPrice"]}.00</h6>
+										</div>
+									</div>
+								</div>
+							</div>`;
+							div.onclick = function () { addToOrderList(product); };  // Add onclick event to add product to order list
+							tabsContainer.appendChild(div);
+						});
+					})
+					.catch(error => console.error('There was an error!', error));
+			}
+
+			function addToOrderList(product) {
+				orderList.push(product);
+				totalCost += Number(product["P_SellPrice"]);
+				updateOrderList();
+			}
+
+			function clearOrderList() {
+				orderList = [];
+				totalCost = 0;
+				updateOrderList();
+			}
+
+			function updateOrderList() {
+				const orderListContainer = document.querySelector('.product-table');
+				orderListContainer.innerHTML = '';  // Clear order list container
+
+				orderList.forEach((product, index) => {
+					const ul = document.createElement('ul');
+					ul.classList.add('product-lists');
+
+					const liDetails = document.createElement('li');
+					liDetails.innerHTML = `
+        <div class="productimg">
+            <div class="productcontet">
+                <h4>${product["P_Name"]}<a href="javascript:void(0);" class="ms-2" data-bs-toggle="modal" data-bs-target="#edit"><img src="/img/icons/edit-5.svg" alt="img"></a></h4>
+            </div>
+        </div>`;
+					ul.appendChild(liDetails);
+
+					const liPrice = document.createElement('li');
+					liPrice.textContent = `${product["P_SellPrice"]}.00`;
+					ul.appendChild(liPrice);
+
+					const liDelete = document.createElement('li');
+					liDelete.innerHTML = `<a class="confirm-text" href="javascript:void(0);"><img src="/img/icons/delete-2.svg" alt="img"></a>`;
+					liDelete.addEventListener('click', function () { deleteFromOrderList(index); }); // Add click event to delete product from order list
+					ul.appendChild(liDelete);
+
+					orderListContainer.appendChild(ul);
+				});
+
+				// Update total items
+				document.querySelector('.totalitem h4').innerText = `Total items : ${orderList.length}`;
+
+				// Update subtotal
+				document.querySelector('.setvalue h6').innerText = `${totalCost.toFixed(2)}`;
+
+				// Update total cost
+				document.querySelector('.total-value h6').innerText = `${totalCost.toFixed(2)}`;
+			}
+
+			function deleteFromOrderList(index) {
+				totalCost -= Number(orderList[index]["P_SellPrice"]);
+				orderList.splice(index, 1);
+				updateOrderList();
+			}
+
+			function doBill() {
+                var total = document.querySelector('.total-value h6').innerText
+				if (orderList.length !== 0) {
+                	fetch("http://localhost:3000/api/customer/order", {
+                    	method: "POST",
+                    	headers: {
+                        	'Content-Type': 'application/json'
+                    	},
+                    	body: JSON.stringify({OrderTotal: total})
+                	})
+                	.then(response => {
+                    	if (!response.ok) {
+                        	throw new Error('Network response was not ok');
+                    	}
+                    	else{
+                        	alert("Order Completed Successfully");
+							clearOrderList()
+                   	 	}
+                    	return response.json();
+               	 	})
+                	.catch((error) => {
+                    	console.error('There was an error!', error);
+                    	alert("Some error occurs, please try again")
+                	});
+				}
+				else{
+					alert("Please fill required fields")
+				}
+            }
+
+
+		</script>
+		<script src="/js/jquery-3.6.0.min.js"></script>
+		<script src="/js/feather.min.js"></script>
+		<script src="/js/jquery.slimscroll.min.js"></script>
+		<script src="/js/bootstrap.bundle.min.js"></script>
+		<script src="/js/jquery.dataTables.min.js"></script>
+		<script src="/js/dataTables.bootstrap4.min.js"></script>
+		<script src="/plugins/select2/js/select2.min.js"></script>
+		<script src="/plugins/owlcarousel/owl.carousel.min.js"></script>
+		<script src="/plugins/sweetalert/sweetalert2.all.min.js"></script>
+		<script src="/plugins/sweetalert/sweetalerts.min.js"></script>
+		<script src="/js/script.js"></script>
+	</body>
+
+</html>

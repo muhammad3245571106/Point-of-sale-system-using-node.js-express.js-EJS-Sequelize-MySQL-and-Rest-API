@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('./partials/_index', user) %>
+			<div class="page-wrapper">
+				<div class="content">
+					<div class="page-header">
+						<div class="page-title">
+							<h4>Sales List</h4>
+							<h6>Manage your sales</h6>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-body">
+							<div class="table-top">
+								<div class="search-set">
+									<div class="search-input">
+										<a class="btn btn-searchset"><img src="/img/icons/search-white.svg" alt="img"></a>
+									</div>
+								</div>
+							</div>
+							<div class="table-responsive">
+								<table class="table ">
+									<thead>
+										<tr>
+											<th>
+												<label class="checkboxs">
+													<input type="checkbox" id="select-all">
+													<span class="checkmarks"></span>
+												</label>
+											</th>
+											<th>Date</th>
+											<th>Customer Name</th>
+											<th>Status</th>
+											<th>Payment</th>
+											<th>Total</th>
+											<th>Paid</th>
+											<th>Due</th>
+											<th>Biller</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+        </div>
+		<script>
+			document.addEventListener("DOMContentLoaded", viewProduct());
+		function viewProduct() {
+			fetch("http://localhost:3000/api/customer/order", {
+				method: "GET",
+			}).then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			}).then(data => {
+				console.log(data);
+				createTable(data)
+			})
+				.catch((error) => {
+					console.error('There was an error!', error);
+				});
+		}
+		function createTable(dataArray) {
+			if (dataArray && dataArray !== undefined && dataArray.length != 0) {
+				var tbody =document.getElementsByTagName("tbody")[0]
+				for (var i = 0; i < dataArray.length; i++) {
+					var tr = document.createElement('tr');
+					var td1 = document.createElement('td');
+					var td2 = document.createElement('td');
+					var td3 = document.createElement('td');
+					var td4 = document.createElement('td');
+					var td5 = document.createElement('td');
+					var td6 = document.createElement('td');
+					var td7 = document.createElement('td');
+					var td8 = document.createElement('td');
+					var td9 = document.createElement('td');
+					var td10 = document.createElement('td');
+					var orderDate = dataArray[i]["OrderDate"]
+					var orderTotal = dataArray[i]["OrderTotal"]
+					var additionalDiscount = dataArray[i]["additionalDiscount"]
+					var customerId = dataArray[i]["C_ID"]
+					
+					td1.innerHTML = `<td><label class="checkboxs"><input type="checkbox"><span class="checkmarks"></span></label></td>`
+					td2.innerHTML = orderDate
+					td3.innerText = "walk-in-customer"
+					td4.innerHTML = "<span class='badges bg-lightred'>Completed</span>"
+					td5.innerHTML = "<span class='badges bg-lightgreen'>Cash</span>"
+					td6.innerText = orderTotal
+					td7.innerText = Math.ceil(orderTotal / 100) * 100
+					td8.innerText = (Math.ceil(orderTotal / 100) * 100) - orderTotal
+					fetch("http://localhost:3000/api/auth/"+customerId)
+					.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			}).then(data => {
+				td9.innerText = data["C_Username"]
+			})
+				.catch((error) => {
+					td9.innerText = ""
+					console.error('There was an error!', error);
+				});
+					tr.appendChild(td1);
+					tr.appendChild(td2);
+					tr.appendChild(td3);
+					tr.appendChild(td4);
+					tr.appendChild(td5);
+					tr.appendChild(td6);
+					tr.appendChild(td7);
+					tr.appendChild(td8);
+					tr.appendChild(td9);
+					tbody.appendChild(tr);
+				}
+			}
+		}
+		</script>
+
+
+        <script src="/js/jquery-3.6.0.min.js"></script>
+		<script src="/js/feather.min.js"></script>
+		<script src="/js/jquery.slimscroll.min.js"></script>
+		<script src="/js/jquery.dataTables.min.js"></script>
+		<script src="/js/dataTables.bootstrap4.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+		<script src="/plugins/select2/js/select2.min.js"></script>
+		<script src="/js/moment.min.js"></script>
+		<script src="/js/bootstrap-datetimepicker.min.js"></script>
+		<script src="/plugins/sweetalert/sweetalert2.all.min.js"></script>
+		<script src="/plugins/sweetalert/sweetalerts.min.js"></script>
+		<script src="/js/script.js"></script>
+    </body>
+</html>

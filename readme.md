@@ -1,4 +1,4 @@
-# Point of Sale (POS) System - README
+# Point of sale system using node.js, express.js, EJS, Sequelize, MySQL, and Rest-API
 
 ## Overview
 The Point of Sale (POS) System is a comprehensive software solution designed to streamline and manage the sales process for businesses of all sizes. This system allows for efficient sales transactions, inventory management, and customer engagement.

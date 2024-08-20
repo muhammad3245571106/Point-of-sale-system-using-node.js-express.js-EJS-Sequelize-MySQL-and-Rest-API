@@ -4,67 +4,67 @@ const Category = db.category;
 const SubCategory = db.subCategory;
 const Op = db.Sequelize.Op;
 // Create and Save a new Product
-exports.create = (req, res) => {
-  if (!req.body.P_Name) {
-    res.status(400).send({
-      message: "Content can not be empty!",
-    });
-    return;
-  }
-  const SubCat_Name = req.body.SubCat_Name;
-  const Cat_Name = req.body.Cat_Name;
-  const customerId = req.user.id; // assuming req.user contains the logged-in customer's details
-  Category.findByPk(Cat_Name)
-    .then((category) => {
-      if (!category) {
-        res.status(400).send({
-          message: "Category not found!",
-        });
-      } else {
-        SubCategory.findByPk(SubCat_Name)
-          .then((subcategory) => {
-            if (!subcategory) {
-              res.status(400).send({
-                message: "Subcategory not found!",
-              });
-            } else {
-              const product = {
-                P_Name: req.body.P_Name,
-                P_Description: req.body.P_Description,
-                P_BasePrice: req.body.P_BasePrice,
-                P_SellPrice: req.body.P_SellPrice,
-                P_Quantity: req.body.P_Quantity,
-                P_BarCode: req.body.P_BarCode,
-                Cat_Name: Cat_Name,
-                SubCat_Name: SubCat_Name,
-                C_ID: customerId,
-              };
-              Products.create(product)
-                .then((data) => {
-                  res.send(data);
-                })
-                .catch((err) => {
-                  res.status(500).send({
-                    message:
-                      err.message ||
-                      "Some error occurred while creating the Product.",
-                  });
-                });
-            }
-          })
-          .catch((err) => {
-            res.status(500).send({
-              message: "Error retrieving Subcategory with id=" + subcategoryId,
-            });
-          });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: "Error retrieving Category with id=" + categoryId,
-      });
-    });
-};
+// exports.create = (req, res) => {
+//   if (!req.body.P_Name) {
+//     res.status(400).send({
+//       message: "Content can not be empty!",
+//     });
+//     return;
+//   }
+//   const SubCat_Name = req.body.SubCat_Name;
+//   const Cat_Name = req.body.Cat_Name;
+//   const customerId = req.user.id; // assuming req.user contains the logged-in customer's details
+//   Category.findByPk(Cat_Name)
+//     .then((category) => {
+//       if (!category) {
+//         res.status(400).send({
+//           message: "Category not found!",
+//         });
+//       } else {
+//         SubCategory.findByPk(SubCat_Name)
+//           .then((subcategory) => {
+//             if (!subcategory) {
+//               res.status(400).send({
+//                 message: "Subcategory not found!",
+//               });
+//             } else {
+//               const product = {
+//                 P_Name: req.body.P_Name,
+//                 P_Description: req.body.P_Description,
+//                 P_BasePrice: req.body.P_BasePrice,
+//                 P_SellPrice: req.body.P_SellPrice,
+//                 P_Quantity: req.body.P_Quantity,
+//                 P_BarCode: req.body.P_BarCode,
+//                 Cat_Name: Cat_Name,
+//                 SubCat_Name: SubCat_Name,
+//                 C_ID: customerId,
+//               };
+//               Products.create(product)
+//                 .then((data) => {
+//                   res.send(data);
+//                 })
+//                 .catch((err) => {
+//                   res.status(500).send({
+//                     message:
+//                       err.message ||
+//                       "Some error occurred while creating the Product.",
+//                   });
+//                 });
+//             }
+//           })
+//           .catch((err) => {
+//             res.status(500).send({
+//               message: "Error retrieving Subcategory with id=" + subcategoryId,
+//             });
+//           });
+//       }
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message: "Error retrieving Category with id=" + categoryId,
+//       });
+//     });
+// };
 exports.create = (req, res) => {
   if (!req.body.P_Name) {
     res.status(400).send({
@@ -112,7 +112,7 @@ exports.create = (req, res) => {
         });
       });
   };
-// Update a Product by the id in the request
+// Find all Products and also apply pagination etc
   exports.findAll = (req, res) => {
   var condition
     page = req.query.page
@@ -159,7 +159,7 @@ exports.create = (req, res) => {
       })
     })
 };
-// Find a single Product with an id
+// Update a single Product with an id
 exports.update = (req, res) => {
   const P_ID = req.params.P_ID;
   Products.update(req.body, {
@@ -182,7 +182,7 @@ exports.update = (req, res) => {
       });
     });
 };
-// Delete a Tutorial with the specified id in the request
+// Delete a Product with the specified id in the request
 exports.delete = (req, res) => {
   const P_ID = req.params.P_ID;
   Products.destroy({
@@ -205,7 +205,7 @@ exports.delete = (req, res) => {
       });
     });
 };
-// Delete all Tutorials from the database.
+// Delete all Products from the database.
 exports.deleteAll = (req, res) => {
     Products.destroy({
     where: {},
